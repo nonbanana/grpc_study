@@ -41,16 +41,25 @@ proto 파일을 언어에 맞게 컴파일 합니다.
 protoc --plugin=protoc-gen-ts_proto=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=. ./people.proto --ts_proto_opt=outputServices=grpc-js,env=node,esModuleInterop=true
 ```
 위 내용을 실행하면 people.proto를 읽고 people.ts를 생성합니다.
-## node 서버 / 클라이언트 생성
+## unary 서버 / 클라이언트 통신
 ### server 코드
 ```js
-import { Server, ServerCredentials, ServerUnaryCall, sendUnaryData } from '@grpc/grpc-js';
+import { Server, ServerCredentials, ServerUnaryCall, sendUnaryData,ServerWritableStream  } from '@grpc/grpc-js';
 import { PeopleServiceService } from './people';
-import { PeopleId, PeopleData } from './people';
+import { PeopleId, PeopleData, PeopleIdList } from './people';
+
+const peopleDataBase:PeopleData[] = [
+    { name: 'Otonose Kanade', address: "seoul, korea",  age: 20 },
+    { name: 'Ichijou Ririka', address: "tokyo, japan",  age: 23 },
+    { name: 'Hiodoshi Ao', address: "tokyo, japan",  age: 22 },
+    { name: 'Juufuutei Raden', address: "tokyo, japan",  age: 22 },
+    { name: 'Todoroki Hajime', address: "tokyo, japan",  age: 21 },
+]
 
 const GetData = (call: ServerUnaryCall<PeopleId, PeopleData>, callback: sendUnaryData<PeopleData>) => {
-    console.log(call.request.id);
-    const data:PeopleData = { address: "tokyo, japan", name: 'Otonose Kanade', age: 21 };
+    let id = call.request.id;
+    console.log(id);
+    const data:PeopleData = peopleDataBase[id];
     callback(null, data);
 }
 
@@ -67,7 +76,7 @@ import { ServiceError, credentials } from '@grpc/grpc-js';
 import { PeopleServiceClient, PeopleData, PeopleId } from './people';
 
 const peopleId: PeopleId = {
-    id: 1
+    id: 0
 };
 
 const client = new PeopleServiceClient(
@@ -91,7 +100,65 @@ npx ts-node ./client.ts
 
 
 
-# stream
+# server stream
 https://floydfajones.medium.com/creating-your-grpc-service-in-nodejs-typescript-part-2-19464c73320b
 
+## proto file
+stream을 테스트 하기 위해서 입력을 list로 받고, 리스트의 각 항목을 하나씩 스트림으로 보내주게 만들어 보겠습니다.
+```proto
+service PeopleService {
+    rpc GetData(PeopleId) returns (PeopleData) {}
+    rpc GetListData(PeopleIdList) returns (stream PeopleData) {}
+}
+
+message PeopleIdList {
+    repeated int32 id = 1;
+}
+```
+* message에서 repeated 명령어를 사용하면 리스트 자료형을 사용하는것을 의미합니다.
+* service 에서 rpc를 새로 정의합니다. 리스트를 입력으로 받고, stream을 리턴합니다.
+## server
+서버쪽 스크립트에 아래와 같이 rpc GetListData에 대응하는 함수를 추가하고
+```js
+const GetListData = (call: ServerWritableStream<PeopleIdList, PeopleData>) => {
+    // console.log(call.request.id);
+    call.request.id.forEach(element => {
+        console.log(`send data: ${element}`);
+        call.write(peopleDataBase[element]);
+    });
+    call.end();
+}
+```
+기존에 있던 import에서 PeopleIdList 추가, addService 에 getListData를 추가해줍니다.
+```js
+
+import { PeopleServiceClient, PeopleData, PeopleId, PeopleIdList } from './people';
+
+server.addService(PeopleServiceService, { getData: GetData, getListData: GetListData}); 
+```
+기존에는 unary는 call, callback 두개를 사용했지만, stream의 경우 call: ServerWritableStream 만 사용합니다. 이때 streaming 하는 데이터는 call.write로 보내 지는 것을 볼 수 있습니다.
+
+## client
+기존에 있던 import에서 PeopleIdList 추가해줍니다.
+```js
+import { PeopleServiceClient, PeopleData, PeopleId, PeopleIdList } from './people';
+```
+```js
+const peopleStream = client.getListData(
+  peopleIdList
+);
+// 시작할때 동작하는것 같은데 확실하진않아서 주석처리해둠
+// peopleStream.on('metadata', () => {
+// console.log('get stream data peopleIdList: [0,1,2]');
+// });
+
+peopleStream.on('data', (data: PeopleData) => {
+  console.log(JSON.stringify(data));
+});
+peopleStream.on('end', () => {
+  console.log('stream end');
+}
+);
+```
+클라이언트 코드엔 위와 같이 `client.getListData(peopleIdList)` 에 대해서 확인하고, getListData에 대한 이벤트를 추가합니다.  data는 stream chunk가 들어왔을때, end는 스트림이 종료되었을때에 대한 이벤트입니다.
 

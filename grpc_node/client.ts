@@ -1,4 +1,4 @@
-import { ServiceError, credentials, InterceptingCall ,ClientReadableStream} from '@grpc/grpc-js';
+import { ServiceError, credentials} from '@grpc/grpc-js';
 import { PeopleServiceClient, PeopleData, PeopleId, PeopleIdList } from './people';
 
 const peopleId: PeopleId = {
@@ -6,7 +6,7 @@ const peopleId: PeopleId = {
 };
 
 const peopleIdList: PeopleIdList = {
-  id: [0,1,2]
+  id: [0, 1, 2]
 };
 
 const client = new PeopleServiceClient(
@@ -23,7 +23,7 @@ client.getData(
 );
 
 
-const peopleStream = client.getAllData(
+const peopleStream = client.getListData(
   peopleIdList
 );
 peopleStream.on('metadata', () => {

@@ -16,7 +16,7 @@ const GetData = (call: ServerUnaryCall<PeopleId, PeopleData>, callback: sendUnar
     const data:PeopleData = peopleDataBase[id];
     callback(null, data);
 }
-const GetAllData = (call: ServerWritableStream<PeopleIdList, PeopleData>) => {
+const GetListData = (call: ServerWritableStream<PeopleIdList, PeopleData>) => {
     // console.log(call.request.id);
     call.request.id.forEach(element => {
         console.log(`send data: ${element}`);
@@ -27,7 +27,7 @@ const GetAllData = (call: ServerWritableStream<PeopleIdList, PeopleData>) => {
 
   
 const server = new Server();
-server.addService(PeopleServiceService, { getData: GetData, getAllData: GetAllData}); 
+server.addService(PeopleServiceService, { getData: GetData, getListData: GetListData}); 
 server.bindAsync('localhost:8080', ServerCredentials.createInsecure(), () => {console.log("server start");});
 
 
