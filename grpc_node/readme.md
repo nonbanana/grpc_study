@@ -25,13 +25,22 @@ message PeopleId {
 }
 ``` 
 위 파일의 내용을 people.proto로 저장하였습니다.
+### syntax
+파일의 맨 위에 `syntax = "proto3";` 로 protobuffer 3 버전에 맞게 작성하였다고 선언합니다. 작성시점에서는 2와 3 버전을 사용할 수 있는데 하위호환성 이슈가 있지 않다면(새로 도입한다면) 3버전을 사용하는게 좋습니다.
+### package
+왜하는지? 몰겠슴다
+### service
+call 될 함수를 정의합니다.
+PeopleId을 입력으로 받고, PeopleData 를 출력으로 받는 GetData 함수를 지정하였습니다.
+### message
+struct를 정의합니다.
 
 ## protobuf compile
 proto 파일을 언어에 맞게 컴파일 합니다.
 ```bash
 protoc --plugin=protoc-gen-ts_proto=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=. ./people.proto --ts_proto_opt=outputServices=grpc-js,env=node,esModuleInterop=true
 ```
-
+위 내용을 실행하면 people.proto를 읽고 people.ts를 생성합니다.
 ## node 서버 / 클라이언트 생성
 ### server 코드
 ```js
@@ -82,6 +91,7 @@ npx ts-node ./client.ts
 
 
 
-
+# stream
+https://floydfajones.medium.com/creating-your-grpc-service-in-nodejs-typescript-part-2-19464c73320b
 
 
