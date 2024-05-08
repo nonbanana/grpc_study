@@ -38,9 +38,9 @@ struct를 정의합니다.
 ## protobuf compile
 proto 파일을 언어에 맞게 컴파일 합니다.
 ```bash
-protoc --plugin=protoc-gen-ts_proto=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=. ./people.proto --ts_proto_opt=outputServices=grpc-js,env=node,esModuleInterop=true
+npm run build:proto
 ```
-위 내용을 실행하면 people.proto를 읽고 people.ts를 생성합니다.
+위 내용을 실행하면 proto 디렉터리에 있는 people.proto를 읽고 people.ts를 생성합니다.
 ## unary 서버 / 클라이언트 통신
 ### server 코드
 ```js
