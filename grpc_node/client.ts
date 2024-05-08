@@ -1,37 +1,39 @@
 import { ServiceError, credentials } from '@grpc/grpc-js';
-import {
-  PeopleServiceClient,
-  PeopleData,
-  PeopleId,
-  PeopleIdList,
-} from './proto/people';
+import { PeopleServiceClient, PeopleData, PeopleId } from './proto/people';
 
-const peopleId: PeopleId = {
-  id: 0,
-};
+import { clientData, eventData, eventStreamServiceClient } from './proto/event';
+import { getRandomInt, logger } from './tools/tools';
 
-const peopleIdList: PeopleIdList = {
-  id: [0, 1, 2],
-};
+const peopleId: PeopleId = { id: 0 };
+const event_log = new logger('event');
+const unary_log = new logger('unary');
 
+const eventClient = new eventStreamServiceClient(
+  'localhost:8080',
+  credentials.createInsecure(),
+);
 const client = new PeopleServiceClient(
   'localhost:8080',
   credentials.createInsecure(),
 );
 
+//unary call 예시
 client.getData(peopleId, (err: ServiceError | null, response: PeopleData) => {
-  console.log(`get unary data peopleId: ${peopleId.id}`);
-  console.log(JSON.stringify(response));
+  unary_log.log(`get unary data peopleId: ${peopleId.id}`);
+  unary_log.log(`Response data: ${JSON.stringify(response)}`);
 });
 
-const peopleStream = client.getListData(peopleIdList);
-peopleStream.on('metadata', () => {
-  console.log('get stream data peopleIdList: [0,1,2]');
-});
+// 이벤트 스트림을 받아옴
+const client_data: clientData = { clientId: getRandomInt(10000) };
+const eventStream = eventClient.getEventStream(client_data);
 
-peopleStream.on('data', (data: PeopleData) => {
-  console.log(JSON.stringify(data));
+//이벤트 스트림의 콜백함수들 등록
+eventStream.on('close', () => {
+  event_log.log('eventStream closed!');
 });
-peopleStream.on('end', () => {
-  console.log('stream end');
+eventStream.on('data', (data: eventData) => {
+  event_log.log(`Event: ${JSON.stringify(data)}`);
+});
+eventStream.on('metadata', (meta) => {
+  event_log.log(`Meta: ${JSON.stringify(meta)}`);
 });

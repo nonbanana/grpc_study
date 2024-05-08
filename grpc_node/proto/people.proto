@@ -4,11 +4,6 @@ package PeoplePackage;
 
 service PeopleService {
     rpc GetData(PeopleId) returns (PeopleData) {}
-    rpc GetListData(PeopleIdList) returns (stream PeopleData) {}
-}
-
-message PeopleIdList {
-    repeated int32 id = 1;
 }
 
 message PeopleData {
