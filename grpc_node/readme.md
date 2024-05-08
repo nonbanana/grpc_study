@@ -94,8 +94,8 @@ client.getData(
 ```
 ## 실행
 ```
-npx ts-node ./server.ts
-npx ts-node ./client.ts
+npm run dev:server
+npm run dev:client
 ```
 
 
