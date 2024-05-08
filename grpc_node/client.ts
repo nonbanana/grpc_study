@@ -1,5 +1,5 @@
 import { ServiceError, credentials} from '@grpc/grpc-js';
-import { PeopleServiceClient, PeopleData, PeopleId, PeopleIdList } from './people';
+import { PeopleServiceClient, PeopleData, PeopleId, PeopleIdList } from './proto/people';
 
 const peopleId: PeopleId = {
     id: 0

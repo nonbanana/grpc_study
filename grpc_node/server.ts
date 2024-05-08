@@ -1,6 +1,6 @@
 import { Server, ServerCredentials, ServerUnaryCall, sendUnaryData,ServerWritableStream  } from '@grpc/grpc-js';
-import { PeopleServiceService } from './people';
-import { PeopleId, PeopleData, PeopleIdList } from './people';
+import { PeopleServiceService } from './proto/people';
+import { PeopleId, PeopleData, PeopleIdList } from './proto/people';
 
 const peopleDataBase:PeopleData[] = [
     { name: 'Otonose Kanade', address: "seoul, korea",  age: 20 },
