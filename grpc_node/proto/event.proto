@@ -12,8 +12,10 @@ message clientData {
 }
 
 message eventPayloadData {
-    optional string payloadString = 1;
-    optional PeoplePackage.PeopleData people_data = 2;
+    oneof data {
+        string payloadString = 1;
+        PeoplePackage.PeopleData people_data = 2;
+    }
 }
 
 message eventData {

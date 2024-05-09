@@ -43,6 +43,10 @@ async function eventStreamFunction(
   event_log.log(`Client ${client_id} connected to eventStream`);
   for (let i = 0; i < 100; i++) {
     const ev_data = makeEventData(client_id);
+    if (!call.writable) {
+      event_log.log(`Client ${client_id} eventStream not writeable!`);
+      break;
+    }
     call.write(ev_data);
     event_log.log(`Send event to client ${client_id}`);
     await sleep(2000);
