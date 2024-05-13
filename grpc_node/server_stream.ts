@@ -1,12 +1,9 @@
 import {
   Server as grpcServer,
   ServerCredentials,
-  ServerUnaryCall,
-  sendUnaryData,
   ServerWritableStream,
 } from '@grpc/grpc-js';
-import { PeopleServiceService } from './proto/people';
-import { PeopleId, PeopleData } from './proto/people';
+import { PeopleData } from './proto/people';
 import {
   eventData,
   clientData,
@@ -16,7 +13,6 @@ import {
 import { getRandomInt, sleep, logger } from './tools/tools';
 
 const event_log = new logger('event');
-const unary_log = new logger('unary');
 
 const peopleDataBase: PeopleData[] = [
   { name: 'Otonose Kanade', address: 'seoul, korea', age: 20 },
@@ -25,16 +21,6 @@ const peopleDataBase: PeopleData[] = [
   { name: 'Juufuutei Raden', address: 'tokyo, japan', age: 22 },
   { name: 'Todoroki Hajime', address: 'tokyo, japan', age: 21 },
 ];
-
-function GetData(
-  call: ServerUnaryCall<PeopleId, PeopleData>,
-  callback: sendUnaryData<PeopleData>,
-) {
-  const id = call.request.id;
-  unary_log.log(`Client request ${id}`);
-  const data: PeopleData = peopleDataBase[id];
-  callback(null, data);
-}
 
 async function eventStreamFunction(
   call: ServerWritableStream<clientData, eventData>,
@@ -94,9 +80,7 @@ const server = new grpcServer({
   'grpc.keepalive_time_ms': 1000,
   'grpc.keepalive_timeout_ms': 5000,
 });
-server.addService(PeopleServiceService, {
-  getData: GetData,
-});
+
 server.addService(eventStreamServiceService, {
   getEventStream: eventStreamFunction,
 });

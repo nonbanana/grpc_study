@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev:server": "nodemon --watch server.ts --exec ts-node server.ts",
-    "dev:client": "nodemon --watch client.ts --exec ts-node client.ts",
+    "dev:server_stream": "nodemon --watch server_stream.ts --exec ts-node server_stream.ts",
+    "dev:client_stream": "nodemon --watch client_stream.ts --exec ts-node client_stream.ts",
     "dev:server_unary": "nodemon --watch server_unary.ts --exec ts-node server_unary.ts",
     "dev:client_unary": "nodemon --watch client_unary.ts --exec ts-node client_unary.ts",
     "build:proto": "protoc --plugin=protoc-gen-ts_proto=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=./ ./proto/*.proto --ts_proto_opt=outputServices=grpc-js,env=node,esModuleInterop=true"
