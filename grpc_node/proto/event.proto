@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package eventStream;
+import "proto/people.proto";
+
+service eventStreamService {
+    rpc GetEventStream(clientData) returns (stream eventData){}
+}
+
+message clientData {
+    int32 clientId = 1;
+}
+
+message eventPayloadData {
+    oneof data {
+        string payloadString = 1;
+        PeoplePackage.PeopleData people_data = 2;
+    }
+}
+
+message eventData {
+    string eventName = 1;
+    int32 eventId = 2;
+    optional eventPayloadData payload = 3;
+}

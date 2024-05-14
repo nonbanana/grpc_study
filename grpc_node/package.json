@@ -4,11 +4,24 @@
   "description": "grpc node test poc",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev:server_stream": "nodemon --watch server_stream.ts --exec ts-node server_stream.ts",
+    "dev:client_stream": "nodemon --watch client_stream.ts --exec ts-node client_stream.ts",
+    "dev:server_unary": "nodemon --watch server_unary.ts --exec ts-node server_unary.ts",
+    "dev:client_unary": "nodemon --watch client_unary.ts --exec ts-node client_unary.ts",
+    "build:proto": "protoc --plugin=protoc-gen-ts_proto=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=./ ./proto/*.proto --ts_proto_opt=outputServices=grpc-js,env=node,esModuleInterop=true"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^7.8.0",
+    "@typescript-eslint/parser": "^7.8.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "nodemon": "^3.1.0",
+    "protoc": "^1.1.3",
+    "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
   },
   "dependencies": {
